@@ -1,5 +1,5 @@
 ﻿/*
- * * Created by Traesh for AshamaneProject (https://github.com/AshamaneProject)
+ * * Created by ArcaniaFr
  */
 using Newtonsoft.Json;
 using Sql;
