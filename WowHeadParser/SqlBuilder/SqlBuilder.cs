@@ -1,5 +1,5 @@
 ﻿/*
- * * Created by ArcaniaFr
+ * * Created by Arcaniafr
  */
 using System;
 using System.Collections.Generic;

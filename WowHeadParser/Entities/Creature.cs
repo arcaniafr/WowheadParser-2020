@@ -1,5 +1,5 @@
 ﻿/*
- * * Created by ArcaniaFr
+ * * Created by Arcaniafr
  */
 using Newtonsoft.Json;
 using Sql;
@@ -472,8 +472,8 @@ namespace WowHeadParser.Entities
                 return 85; // Orgrimmar
             else if (m_creatureTemplateData.react[(int)reactOrder.ALLIANCE] == "0" && m_creatureTemplateData.react[(int)reactOrder.HORDE] == "0")
                 return 2240; // Neutral
-            else
-                return 14;
+
+            return 14;
         }
 
         public override String GetSQLRequest()

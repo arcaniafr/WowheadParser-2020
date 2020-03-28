@@ -1,5 +1,5 @@
 ﻿/*
- * * Created by ArcaniaFr
+ * * Created by Traesh for AshamaneProject (https://github.com/AshamaneProject)
  */
 using System.Net;
 using System.Text;
