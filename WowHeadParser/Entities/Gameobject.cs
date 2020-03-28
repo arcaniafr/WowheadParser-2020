@@ -1,5 +1,5 @@
 ﻿/*
- * * Created by ArcaniaFr
+ * * Created by Arcaniafr
  */
 using Newtonsoft.Json;
 using Sql;
@@ -9,6 +9,19 @@ using static WowHeadParser.MainWindow;
 
 namespace WowHeadParser.Entities
 {
+    class GameObjectQuestStarterEnderParsing
+    {
+        public int category;
+        public int category2;
+        public int id;
+        public int level;
+        public int money;
+        public string name;
+        public int reqlevel;
+        public int side;
+        public int xp;
+    }
+
     class Gameobject : Entity
     {
         struct GameObjectParsing
@@ -41,17 +54,17 @@ namespace WowHeadParser.Entities
 
         public Gameobject()
         {
-            m_data.id = 0;
+            m_gameobjectTemplateData.id = 0;
         }
 
         public Gameobject(int id)
         {
-            m_data.id = id;
+            m_gameobjectTemplateData.id = id;
         }
 
         public override String GetWowheadUrl()
         {
-            return GetWowheadBaseUrl() + "/object=" + m_data.id;
+            return GetWowheadBaseUrl() + "/object=" + m_gameobjectTemplateData.id;
         }
 
         public override List<Entity> GetIdsFromZone(String zoneId, String zoneHtml)
@@ -72,23 +85,23 @@ namespace WowHeadParser.Entities
 
         public override bool ParseSingleJson(int id = 0)
         {
-            if (m_data.id == 0 && id == 0)
+            if (m_gameobjectTemplateData.id == 0 && id == 0)
                 return false;
-            else if (m_data.id == 0 && id != 0)
-                m_data.id = id;
+            else if (m_gameobjectTemplateData.id == 0 && id != 0)
+                m_gameobjectTemplateData.id = id;
 
             String gameobjectHtml = Tools.GetHtmlFromWowhead(GetWowheadUrl());
 
-            String gameobjectDataPattern = @"\$\.extend\(g_objects\[" + m_data.id + @"\], (.+)\);";
-            String gameobjectLootPattern = @"new Listview\(\{template: 'item', id: 'contains', name: LANG.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview.funcBox.initLootTable, onAfterCreate: Listview.funcBox.addModeIndicator, data: (.+)\}\);";
+            String gameobjectDataPattern = @"\$\.extend\(g_objects\[" + m_gameobjectTemplateData.id + @"\], (.+)\);";
+            String gameobjectLootPattern = @"new Listview\({template: 'item', id: 'contains', name: LANG\.tab_contains, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)\}\);";
             String gameobjectLootCurrencyPattern = @"new Listview\({template: 'currency', id: 'contains-currency', name: LANG\.tab_currencies, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], _totalCount: [0-9]+, computeDataFunc: Listview\.funcBox\.initLootTable, onAfterCreate: Listview\.funcBox\.addModeIndicator, data: (.+)}\);";
-            String gameobjectHerboPattern = @"new Listview\(\{template: 'item', id: 'herbalism', name: LANG.tab_herbalism, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview.extraCols.count, Listview.extraCols.percent\], sort:\['-percent', 'name'\], computeDataFunc: Listview.funcBox.initLootTable, note: WH\.sprintf\(LANG.lvnote_objectherbgathering, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
-            String gameobjectMiningPattern = @"new Listview\(\{template: 'item', id: 'mining', name: LANG\.tab_mining, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_objectmining, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
+            String gameobjectHerboPattern = @"new Listview\({template: 'item', id: 'herbalism', name: LANG\.tab_herbalism, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent\], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG.lvnote_objectherbgathering, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
+            String gameobjectMiningPattern = @"new Listview\({template: 'item', id: 'mining', name: LANG\.tab_mining, tabs: tabsRelated, parent: 'lkljbjkb574', extraCols: \[Listview\.extraCols\.count, Listview\.extraCols\.percent], sort:\['-percent', 'name'\], computeDataFunc: Listview\.funcBox\.initLootTable, note: WH\.sprintf\(LANG\.lvnote_objectmining, [0-9]+\), _totalCount: ([0-9]+), data: (.+)\}\);";
 
             String gameobjectDataJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectDataPattern);
             if (gameobjectDataJSon != null)
             {
-                m_data = JsonConvert.DeserializeObject<GameObjectParsing>(gameobjectDataJSon);
+                m_gameobjectTemplateData = JsonConvert.DeserializeObject<GameObjectParsing>(gameobjectDataJSon);
             }
 
             String gameobjectLootItemJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectLootPattern);
@@ -114,6 +127,22 @@ namespace WowHeadParser.Entities
             {
                 GameObjectLootParsing[] gameobjectMiningDatas = JsonConvert.DeserializeObject<GameObjectLootParsing[]>(gameobjectMiningJSon);
                 SetGameobjectHerbalismOrMiningData(gameobjectMiningDatas, Int32.Parse(gameobjectMiningTotalCount), false);
+            }
+
+            String gameobjectQuestStarterPattern = @"new Listview\(\{template: 'quest', id: 'starts', name: LANG\.tab_starts, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
+            String gameobjectQuestStarterJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectQuestStarterPattern);
+            if (gameobjectQuestStarterJSon != null)
+            {
+                GameObjectQuestStarterEnderParsing[] gameobjectQuestStarterDatas = JsonConvert.DeserializeObject<GameObjectQuestStarterEnderParsing[]>(gameobjectQuestStarterJSon);
+                m_gameobjectQuestStarterDatas = gameobjectQuestStarterDatas;
+            }
+
+            String gameobjectQuestEnderPattern = @"new Listview\(\{template: 'quest', id: 'ends', name: LANG\.tab_ends, tabs: tabsRelated, parent: 'lkljbjkb574', data: (.+)\}\);";
+            String gameobjectQuestEnderJSon = Tools.ExtractJsonFromWithPattern(gameobjectHtml, gameobjectQuestEnderPattern);
+            if (gameobjectQuestEnderJSon != null)
+            {
+                GameObjectQuestStarterEnderParsing[] gameobjectQuestEnderDatas = JsonConvert.DeserializeObject<GameObjectQuestStarterEnderParsing[]>(gameobjectQuestEnderJSon);
+                m_gameobjectQuestEnderDatas = gameobjectQuestEnderDatas;
             }
 
             return true;
@@ -210,7 +239,7 @@ namespace WowHeadParser.Entities
         {
             String returnSql = "";
 
-            if (m_data.id == 0 || isError)
+            if (m_gameobjectTemplateData.id == 0 || isError)
                 return returnSql;
 
             if (IsCheckboxChecked("locale"))
@@ -222,7 +251,7 @@ namespace WowHeadParser.Entities
                     m_gameobjectLocalesBuilder = new SqlBuilder("gameobject_template_locale", "entry");
                     m_gameobjectLocalesBuilder.SetFieldsNames("locale", "name");
 
-                    m_gameobjectLocalesBuilder.AppendFieldsValue(m_data.id, localeIndex.ToString(), m_data.name);
+                    m_gameobjectLocalesBuilder.AppendFieldsValue(m_gameobjectTemplateData.id, localeIndex.ToString(), m_gameobjectTemplateData.name);
                     returnSql += m_gameobjectLocalesBuilder.ToString() + "\n";
                 }
                 else
@@ -230,7 +259,7 @@ namespace WowHeadParser.Entities
                     m_gameobjectLocalesBuilder = new SqlBuilder("gameobject_template", "entry");
                     m_gameobjectLocalesBuilder.SetFieldsNames("name");
 
-                    m_gameobjectLocalesBuilder.AppendFieldsValue(m_data.id, m_data.name);
+                    m_gameobjectLocalesBuilder.AppendFieldsValue(m_gameobjectTemplateData.id, m_gameobjectTemplateData.name);
                     returnSql += m_gameobjectLocalesBuilder.ToString() + "\n";
                 }
             }
@@ -240,7 +269,7 @@ namespace WowHeadParser.Entities
                 m_gameobjectLootBuilder = new SqlBuilder("gameobject_loot_template", "entry", SqlQueryType.DeleteInsert);
                 m_gameobjectLootBuilder.SetFieldsNames("Item", "Reference", "Chance", "QuestRequired", "LootMode", "GroupId", "MinCount", "MaxCount", "Comment");
 
-                returnSql += "UPDATE gameobject_template SET data1 = " + m_data.id + " WHERE entry = " + m_data.id + " AND type IN (3, 50);\n";
+                returnSql += "UPDATE gameobject_template SET data1 = " + m_gameobjectTemplateData.id + " WHERE entry = " + m_gameobjectTemplateData.id + " AND type IN (3, 50);\n";
                 foreach (GameObjectLootParsing gameobjectLootData in m_gameobjectLootDatas)
                 {
                     GameObjectLootCurrencyParsing currentLootCurrencyData = null;
@@ -262,7 +291,7 @@ namespace WowHeadParser.Entities
                     int maxLootCount = gameobjectLootData.stack.Length >= 2 ? gameobjectLootData.stack[1] : minLootCount;
 
 
-                    m_gameobjectLootBuilder.AppendFieldsValue(  m_data.id, // Entry
+                    m_gameobjectLootBuilder.AppendFieldsValue(m_gameobjectTemplateData.id, // Entry
                                                                 gameobjectLootData.id * idMultiplier, // Item
                                                                 0, // Reference
                                                                 gameobjectLootData.percent, // Chance
@@ -282,9 +311,9 @@ namespace WowHeadParser.Entities
                 m_gameobjectHerbalismBuilder = new SqlBuilder("gameobject_loot_template", "entry", SqlQueryType.InsertIgnore);
                 m_gameobjectHerbalismBuilder.SetFieldsNames("Item", "Reference", "Chance", "QuestRequired", "LootMode", "GroupId", "MinCount", "MaxCount", "Comment");
 
-                returnSql += "UPDATE gameobject_template SET data1 = " + m_data.id + " WHERE entry = " + m_data.id + " AND type IN (3, 50);\n";
+                returnSql += "UPDATE gameobject_template SET data1 = " + m_gameobjectTemplateData.id + " WHERE entry = " + m_gameobjectTemplateData.id + " AND type IN (3, 50);\n";
                 foreach (GameObjectLootParsing gameobjectHerbalismData in m_gameobjectHerbalismDatas)
-                    m_gameobjectHerbalismBuilder.AppendFieldsValue(m_data.id, // Entry
+                    m_gameobjectHerbalismBuilder.AppendFieldsValue(m_gameobjectTemplateData.id, // Entry
                                                                    gameobjectHerbalismData.id, // Item
                                                                    0, // Reference
                                                                    gameobjectHerbalismData.percent, // Chance
@@ -303,9 +332,9 @@ namespace WowHeadParser.Entities
                 m_gameobjectMiningBuilder = new SqlBuilder("gameobject_loot_template", "entry", SqlQueryType.InsertIgnore);
                 m_gameobjectMiningBuilder.SetFieldsNames("Item", "Reference", "Chance", "QuestRequired", "LootMode", "GroupId", "MinCount", "MaxCount", "Comment");
 
-                returnSql += "UPDATE gameobject_template SET data1 = " + m_data.id + " WHERE entry = " + m_data.id + " AND type IN (3, 50);\n";
+                returnSql += "UPDATE gameobject_template SET data1 = " + m_gameobjectTemplateData.id + " WHERE entry = " + m_gameobjectTemplateData.id + " AND type IN (3, 50);\n";
                 foreach (GameObjectLootParsing gameobjectMiningData in m_gameobjectMiningDatas)
-                    m_gameobjectMiningBuilder.AppendFieldsValue(m_data.id, // Entry
+                    m_gameobjectMiningBuilder.AppendFieldsValue(m_gameobjectTemplateData.id, // Entry
                                                                 gameobjectMiningData.id, // Item
                                                                 0, // Reference
                                                                 gameobjectMiningData.percent, // Chance
@@ -319,17 +348,42 @@ namespace WowHeadParser.Entities
                 returnSql += m_gameobjectMiningBuilder.ToString() + "\n";
             }
 
+            if (IsCheckboxChecked("quest starter") && m_gameobjectQuestStarterDatas != null)
+            {
+                m_gameobjectQuestStarterBuilder = new SqlBuilder("gameobject_queststarter", "id", SqlQueryType.DeleteInsert);
+                m_gameobjectQuestStarterBuilder.SetFieldsNames("quest");
+
+                foreach (GameObjectQuestStarterEnderParsing gameobjectQuestStarterData in m_gameobjectQuestStarterDatas)
+                    m_gameobjectQuestStarterBuilder.AppendFieldsValue(m_gameobjectTemplateData.id, gameobjectQuestStarterData.id);
+                returnSql += m_gameobjectQuestStarterBuilder.ToString() + "\n";
+            }
+
+            if (IsCheckboxChecked("quest ender") && m_gameobjectQuestEnderDatas != null)
+            {
+                m_gameobjectQuestEnderBuilder = new SqlBuilder("gameobject_questender", "id", SqlQueryType.DeleteInsert);
+                m_gameobjectQuestEnderBuilder.SetFieldsNames("quest");
+
+                foreach (GameObjectQuestStarterEnderParsing creatureQuestEnderData in m_gameobjectQuestEnderDatas)
+                    m_gameobjectQuestEnderBuilder.AppendFieldsValue(m_gameobjectTemplateData.id, creatureQuestEnderData.id);
+
+                returnSql += m_gameobjectQuestEnderBuilder.ToString() + "\n";
+            }
+
             return returnSql;
         }
 
-        private GameObjectParsing m_data;
+        private GameObjectParsing m_gameobjectTemplateData;
         protected GameObjectLootParsing[] m_gameobjectLootDatas;
         protected GameObjectLootParsing[] m_gameobjectHerbalismDatas;
         protected GameObjectLootParsing[] m_gameobjectMiningDatas;
+        protected GameObjectQuestStarterEnderParsing[] m_gameobjectQuestStarterDatas;
+        protected GameObjectQuestStarterEnderParsing[] m_gameobjectQuestEnderDatas;
 
         protected SqlBuilder m_gameobjectLootBuilder;
         protected SqlBuilder m_gameobjectHerbalismBuilder;
         protected SqlBuilder m_gameobjectMiningBuilder;
         protected SqlBuilder m_gameobjectLocalesBuilder;
+        protected SqlBuilder m_gameobjectQuestStarterBuilder;
+        protected SqlBuilder m_gameobjectQuestEnderBuilder;
     }
 }
