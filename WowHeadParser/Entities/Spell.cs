@@ -1,5 +1,5 @@
 ﻿/*
- * * Created by Arcaniafr
+ * * Created by ArcaniaFr
  */
 using Newtonsoft.Json;
 using Sql;

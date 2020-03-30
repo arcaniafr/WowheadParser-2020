@@ -1,5 +1,5 @@
 ﻿/*
- * * Created by Arcaniafr
+ * * Created by ArcaniaFr
  */
 using Newtonsoft.Json;
 using Sql;
@@ -157,7 +157,6 @@ namespace WowHeadParser.Entities
                 String creatureHealthPattern = @"<div>(?:Health|Vie) : ((?:\d|,|\.)+)</div>";
                 String creatureMoneyPattern = @"\[money=([0-9]+)\]";
                 String creatureModelIdPattern = @"WH\.ModelViewer\.showLightbox\({&quot;type&quot;:[0-9]+,&quot;typeId&quot;:" + m_creatureTemplateData.id + @",&quot;displayId&quot;:([0-9]+)}\)";
-
                 String creatureTemplateDataJSon = Tools.ExtractJsonFromWithPattern(creatureHtml, dataPattern);
                 if (creatureTemplateDataJSon != null)
                 {
